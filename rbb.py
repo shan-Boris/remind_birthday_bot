@@ -52,19 +52,18 @@ def callback(call):
                     bot.send_message(call.message.chat.id, f'{i} {all_dr[i]}', reply_markup=markup2)
     
         if call.data == 'del':      # удаляем чье-то др
-            markup3 = types.InlineKeyboardMarkup(row_width=2)
+            bot.send_message(call.message.chat.id, 'Вот кто в списке:')
             for i in all_dr:
-                i = types.InlineKeyboardButton(i, callback_data=i)
-                markup3.add(i)
-            bot.send_message(call.message.chat.id, 'Кого удалить?',reply_markup=markup3)
-        if call.data in all_dr:
-            del all_dr[call.data]
-            bot.send_message(call.message.chat.id, f'Больше о ДР {call.data} напоминать не буду', reply_markup=markup2)
-
+                bot.send_message(call.message.chat.id, i)
+            bot.send_message(call.message.chat.id, 'Кого удалить?')
+            bot.message_handler(content_types=['text'])
+            def del_dr(message):
+                print('запуск')
+                if message.text in all_dr.keys():
+                    del all_dr[message.text]
 
 @bot.message_handler(content_types=['text'])
 def get_name(message):
-    
     if run:
       
         global name
