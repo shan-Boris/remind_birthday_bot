@@ -9,7 +9,7 @@ all_dr={}
 
 markup2 = types.InlineKeyboardMarkup(row_width=2)           # клавиатура для дальнейших действий
 item1 = types.InlineKeyboardButton('Добавить ещё', callback_data='add')
-item2 = types.InlineKeyboardButton('Весь список людей', callback_data='all')
+item2 = types.InlineKeyboardButton('Список дней рождений', callback_data='all')
 item3 = types.InlineKeyboardButton('Удалить из списка', callback_data='del')
 markup2.add(item1, item3, item2)
     
@@ -35,8 +35,7 @@ def hello(message):
 
     with open(f'{message.chat.id}.json', "r") as e:     
         all_dr = json.loads(str(e.read()))
-
-    bot.send_message(message.chat.id, 'Привет, {0.first_name}!\n Я бот-напоминалка о днях рождениях твоих родных и друзей. \n Я напомню в нужное время о необходимости поздравить друга, которого добавишь в список, а к концу ДР этого человека переспрошу поздравили ли вы его. Для начала нужно составить список людей о чьих днях рождениях напоминать, для этого нажми \"Добавить\"'.format(message.from_user, bot.get_me()), parse_mode='html', reply_markup=markup)
+    bot.send_message(message.chat.id, 'Привет, {0.first_name}!\n Я бот-запоминалка о днях рождениях твоих родных и друзей. \n Я запомню все дни рождения людей, которых ты добавишь в список и теперь ты сможешь всегда посмотреть когда точно у кого ДР. \n Для начала нужно составить список людей чьи ДР запомнить, для этого нажми \"Добавить\"'.format(message.from_user, bot.get_me()), parse_mode='html', reply_markup=markup)
     
 
 run = False
@@ -76,7 +75,7 @@ def callback(call):
             del all_dr[call.data]
             with open(f'{call.message.chat.id}.json', "w") as f:
                 f.write(json.dumps(all_dr))
-            bot.send_message(call.message.chat.id, f'Больше о ДР {call.data} напоминать не буду', reply_markup=markup2)
+            bot.send_message(call.message.chat.id, f'Больше дня рождения {call.data} в списке нет', reply_markup=markup2)
 
 
 @bot.message_handler(content_types=['text'])
@@ -92,6 +91,7 @@ def get_name(message):
 
 def get_dr(message):            
     global dr
+    global run
     dr = message.text
     if get_ddmm(dr) != False:           # если дата введена верно, то добавляем в словарь ДР
         
@@ -101,13 +101,12 @@ def get_dr(message):
         all_dr[name] = dr
         with open(f'{message.from_user.id}.json', "w") as f:
             f.write(json.dumps(all_dr))
-        bot.send_message(message.from_user.id, f'Запомнил: ДР у {name} {dr} \n Я напомню в 9.00 {dr}, что у {name} день рождения, \n а в 23.00 спрошу: поздравили ли {name}', reply_markup=markup2)
+        bot.send_message(message.from_user.id, f'Запомнил: ДР у {name} {dr}', reply_markup=markup2)
    
 
     else:
         bot.send_message(message.from_user.id, 'Неверная дата')
         get_name(message)
-    # bot.register_next_step_handler(message, get_surnme);
                 
 
 
