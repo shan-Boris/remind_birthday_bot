@@ -30,10 +30,10 @@ def hello(message):
     markup = types.InlineKeyboardMarkup(row_width=1)
     item0 = types.InlineKeyboardButton('Добавить', callback_data='add')
     markup.add(item0)
-    with open(f'{message.chat.id}.json', "w") as f:     # Создание словаря ДР пользователя
+    with open(f'{message.from_user.id}.json', "w") as f:     # Создание словаря ДР пользователя
         f.write(json.dumps(all_dr))
 
-    with open(f'{message.chat.id}.json', "r") as e:     
+    with open(f'{message.from_user.id}.json', "r") as e:     
         all_dr = json.loads(str(e.read()))
     bot.send_message(message.chat.id, 'Привет, {0.first_name}!\n Я бот-запоминалка о днях рождениях твоих родных и друзей. \n Я запомню все дни рождения людей, которых ты добавишь в список и теперь ты сможешь всегда посмотреть когда точно у кого ДР. \n Для начала нужно составить список людей чьи ДР запомнить, для этого нажми \"Добавить\"'.format(message.from_user, bot.get_me()), parse_mode='html', reply_markup=markup)
     
@@ -41,6 +41,7 @@ def hello(message):
 run = False
 @bot.callback_query_handler(func=lambda call: True)
 def callback(call):
+    
     global all_dr 
     if call.message:
         if call.data == 'add':      # ответ на кнопку "добавить" или "добавить ещё"
@@ -51,7 +52,7 @@ def callback(call):
             bot.send_message(call.message.chat.id, 'Введите имя:')
         if call.data == 'all':      # выводим весь список ДР, к последнему сообщению прикрепляем клавиатуру для дальнейших действий
             v=0
-            with open(f'{call.message.chat.id}.json', "r") as e:
+            with open(f'{call.from_user.id}.json', "r") as e:
                 all_dr = json.loads(str(e.read()))
 
             n = len(all_dr.keys())
@@ -64,7 +65,7 @@ def callback(call):
     
         if call.data == 'del':      # удаляем чье-то др
             markup3 = types.InlineKeyboardMarkup(row_width=2)
-            with open(f'{call.message.chat.id}.json', "r") as e:
+            with open(f'{call.from_user.id}.json', "r") as e:
                 all_dr = json.loads(str(e.read()))
 
             for i in all_dr:
@@ -73,7 +74,7 @@ def callback(call):
             bot.send_message(call.message.chat.id, 'Кого удалить?',reply_markup=markup3)
         if call.data in all_dr:
             del all_dr[call.data]
-            with open(f'{call.message.chat.id}.json', "w") as f:
+            with open(f'{call.from_user.id}.json', "w") as f:
                 f.write(json.dumps(all_dr))
             bot.send_message(call.message.chat.id, f'Больше дня рождения {call.data} в списке нет', reply_markup=markup2)
 
